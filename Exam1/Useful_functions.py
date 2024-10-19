@@ -168,3 +168,44 @@ def jacobi_method(x0,xn,N,y0,yn,yguess,func,tol,maxiter):
     
     return(x,y,j)
 
+#Creation of a Homogenous Transformation Matrix
+def create_htm(R,O):
+    if O.shape!=(R.shape[0],1):
+        O=O.reshape(R.shape[0],1)
+
+    T=np.hstack((R,O))
+    c=np.zeros(T.shape[1]-1)
+    c=np.append(c,np.array([1]))
+    T=np.vstack((T,c))
+
+    return(T)
+
+#Creation of a rotation matrix depending on the angle of rotation along which axis
+def rotation_matrix_creation(angle,axis):
+#Angles must be in radians
+    if axis=='x':
+        R=np.array([[1,0,0],
+                    [0,np.cos(angle),-np.sin(angle)],
+                    [0,np.sin(angle),-np.cos(angle)]])
+    elif axis=='y':
+        R=np.array([[np.cos(angle),0,np.sin(angle)],
+                    [0,1,0],
+                    [-np.sin(angle),0,np.cos(angle)]])
+    elif axis=='z':
+        R=np.array([[np.cos(angle),-np.sin(angle),0],
+                    [np.sin(angle),np.cos(angle),0],
+                    [0,0,1]])
+    return(R)
+
+#inversion of a HTM to reverse the direction of it
+def inversion_htm(R,O):
+    if O.shape!=(R.shape[0],1):
+        O=O.reshape(R.shape[0],1)
+
+    T=np.hstack((R,-R*O))
+    c=np.zeros(T.shape[1]-1)
+    c=np.append(c,np.array([1]))
+    T=np.vstack((T,c))
+
+    return(T)
+
