@@ -4,42 +4,53 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy import interpolate
+import pdb
+import sys
+sys.path.insert(1, '../Exam1/')
+import Useful_functions as nsae
+
+def cubic_spline(x,fx):
+    # calculate Cubic Spline using Scipy method
+    cs=interpolate.CubicSpline(x,fx,bc_type='natural')
+    xr=np.linspace(min(x),max(x)+1,100)
+    #Construct the polinomials for each section
+    p=[]
+    for i in range(len(fx)-1):
+        px=cs.c[0,i]*(xr-x[i])**3+cs.c[1,i]*(xr-x[i])**2+cs.c[2,i]*(xr-x[i])+cs.c[3,i]
+        p.append(px)
+    
+    p=np.asarray(p)
+    return(cs,p,xr)
+
 
 b=m=vo=1
 
 #Time points
-t=np.linspace(0,3,4,dtype=int)
+t=np.array([1,2,3,4])
 #Position data points
-xd=np.array([0,0.63,0.86,0.95])
+ft=np.sqrt(t)
 #Axis creation
-tr=np.linspace(0,3.5,1000)
+
+#cubic spline calculation
+cs1,p1,tr=nsae.cubic_spline(t,ft)
 
 #Real function 
-xr=m*vo/b*(1-np.exp(-b/m*tr))
-
-# calculate Cubic Spline using Scipy method
-cs=interpolate.CubicSpline(t,xd,bc_type='natural')
-
-#Construct the polinomials for each section
-p12=cs.c[0,0]*(tr-t[0])**3+cs.c[1,0]*(tr-t[0])**2+cs.c[2,0]*(tr-t[0])+cs.c[3,0]
-p23=cs.c[0,1]*(tr-t[1])**3+cs.c[1,1]*(tr-t[1])**2+cs.c[2,1]*(tr-t[1])+cs.c[3,1]
-p34=cs.c[0,2]*(tr-t[2])**3+cs.c[1,2]*(tr-t[2])**2+cs.c[2,2]*(tr-t[2])+cs.c[3,2]
-
-
+#xr=m*vo/b*(1-np.exp(-b/m*tr))
+ftr=np.sqrt(tr)
 #Graphs and data visualitzation
 fig, ax = plt.subplots(figsize=(6.5, 4))
 ax.set_xlabel('t(s)')
 ax.set_ylabel('x(km)')
-ax.set_xlim(0,3)
-ax.plot(t,xd,'or',markersize=10,label='data')
-ax.plot(tr,cs(tr),color='blue',label='S')
-ax.plot(tr,cs(tr,1),label="S'")
-ax.plot(tr,cs(tr,2),label="S''")
-ax.plot(tr,cs(tr,3),label="S'''")
-ax.plot(tr,xr,'--',linewidth=5,label="x(t)")
-#ax.plot(tr,p12,'-.',label="p1,2")
-#ax.plot(tr,p23,'-.',label="p2,3")
-#ax.plot(tr,p34,'-.',label="p3,4")
+ax.set_xlim(min(tr),max(tr))
+ax.plot(t,ft,'or',markersize=10,label='data')
+ax.plot(tr,cs1(tr),color='blue',label='S')
+#ax.plot(tr,cs1(tr,1),label="S'")
+#ax.plot(tr,cs1(tr,2),label="S''")
+#ax.plot(tr,cs1(tr,3),label="S'''")
+ax.plot(tr,ftr,'--',linewidth=5,label="x(t)")
+#ax.plot(tr,p1[0],'-.',label="p1,2")
+#ax.plot(tr,p1[1],'-.',label="p2,3")
+#ax.plot(tr,p1[2],'-.',label="p3,4")
 #
 ax.legend(loc='lower right', ncol=2)
 

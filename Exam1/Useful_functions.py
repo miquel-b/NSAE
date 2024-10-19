@@ -7,10 +7,19 @@ from scipy import interpolate
 
 #Interpolation using lagrange polynomial
 def lagrange_poly(x,fx,N):
+    '''
+    x=known x points
+    fx=known f(x) points
+    N=Number of points to interpolate
+    
+    Return:
+            p=x values where the polynomial has been evaluated (arr)
+            px= p(x) points where interpolation has been evaluated
+    '''
 
-    p=np.linspace(x[0],x[-1],N,endpoint=True)
-    #p=np.insert(p,0,x[0]-1)
-    #p=np.append(p,x[-1]+1)
+
+    p=np.linspace(x[0],x[-1],N)
+    p=np.sort(np.append(p,x)) 
     px=np.array([])
     
     for xi in p:
@@ -27,6 +36,30 @@ def lagrange_poly(x,fx,N):
     
     return(p,px)
 
+#Natural cubic spline interpolation using scipy
+def cubic_spline(x,fx):
+    '''
+    x=known x points
+    fx=known f(x) points
+    
+    Return:
+            cs=Scipy cubic spline polynomial, can be plotted directly ax.plot(x,cs(x),color='blue',label='S') it can also calculate derivatives using cs(x,n) for n order derivative. It can also print coeficents by cs.c[0,n]*(x-xj)³+cs.c[1,n]*(x-xj)²+cs.c[2,n]*(x-xj)+cs.c[3,n], n being each polynomial.
+            Esencially equivalent to aj,bj,cj,dj coefficents of documentation pdf pag 25 eq. 17.
+            p= p(x) points where interpolation has been evaluated for xr arr(arr())
+            xr= 100 points where the polynomial has been evaluated useful for plotting
+    '''
+
+    # calculate Cubic Spline using Scipy method
+    cs=interpolate.CubicSpline(x,fx,bc_type='natural')
+    xr=np.linspace(min(x),max(x)+1,100)
+    #Construct the polinomials for each section
+    p=[]
+    for i in range(len(fx)-1):
+        px=cs.c[0,i]*(xr-x[i])**3+cs.c[1,i]*(xr-x[i])**2+cs.c[2,i]*(xr-x[i])+cs.c[3,i]
+        p.append(px)
+    
+    p=np.asarray(p)
+    return(cs,p,xr)
 
 #Eulers centered method to solve second order ODE
 #Usage:
