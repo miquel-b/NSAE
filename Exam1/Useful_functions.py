@@ -31,25 +31,23 @@ def lagrange_poly(x,fx,N):
 #Eulers centered method to solve second order ODE
 #Usage:
 # t,y1,y2,dy2=eulers_ode(t0,tn,N,lambda r:(-G*Me/((r)**2))) where r is the 0 order function
-def eulers_ode(t0,tn,N,func):
+def eulers_ode(t0,tn,y0,dy0,N,func):
     t=np.linspace(t0,tn,num=N,endpoint=True)
     h=t[1]-t[0]
     
-    y10=r0
-    y20=v0
     
-    y1=np.array([y10])
-    y2=np.array([y20])
+    y1=np.array([y0])
+    y2=np.array([dy0])
     
     for i in range(0,N-1):
         xa=t[i]+(h/2)
         y1a=y1[i]+(h/2)*y2[i]
-        y2a=y2[i]+(h/2)*func(y1[i])
+        y2a=y2[i]+(h/2)*func(y1[i],y2[i])
         y1=np.append(y1,y1[i]+h*y2a)
-        y2=np.append(y2,y2[i]+h*func(y1a))
+        y2=np.append(y2,y2[i]+h*func(y1a,y2a))
     
     
-    dy2=func(y1)
+    dy2=func(y1,y2)
     return(t,y1,y2,dy2)
     
 

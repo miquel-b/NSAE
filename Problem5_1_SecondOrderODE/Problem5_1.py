@@ -9,27 +9,30 @@ sns.set_theme()
 
 plt.close('all')
 
+def leap_frog_ode(t0,tn,y0,dy0,N,func):
+    t=np.linspace(t0,tn,num=N,endpoint=True)
+    h=t[1]-t[0]
+    
+    y1=np.array([y0])
+    y2=np.array([dy0])
+    
+    for i in range(0,N-1):
+        y1=np.append(y1,y1[i]+h*y2[i])
+        y2=np.append(y2,y2[i]+h*func(y1[i],y2[i]))
+    
+    dy2=func(y1,y2)
+    return(t,y1,y2,dy2)
+
+
 b=m=1
 N=50
 t0=0
 tn=5
 
-t=np.linspace(t0,tn,num=N,endpoint=True)
-h=t[1]-t[0]
-
 y10=0
 y20=1
 
-y1=np.array([y10])
-y2=np.array([y20])
-
-for i in range(0,N-1):
-    y1=np.append(y1,y1[i]+h*y2[i])
-    y2=np.append(y2,y2[i]+h*(-(b/m)*y2[i]))
-
-print('y1=', y1, '\n')
-print('y2=', y2, '\n')
-dy2=-b/m*y2
+t,y1,y2,dy2=leap_frog_ode(t0,tn,y10,y20,N,lambda y,dy: (-b/m)*dy+0*y)
 
 yreal=(m*y20/b)*(1-np.exp(-b*t/m))
 dyreal=y20*np.exp(-b*t/m)
